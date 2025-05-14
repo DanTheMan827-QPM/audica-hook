@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Lauriethefish/QuestPatcher.QMod/main/QuestPatcher.QMod/Resources/qmod.schema.json",
+  "_QPVersion": "0.1.1",
+  "name": "${mod_name}",
+  "id": "${mod_id}",
+  "author": "sc2ad / DanTheMan827",
+  "version": "${version}",
+  "packageId": "com.harmonixmusic.kata",
+  "description": "A significantly stripped down version of the beatsaber-hook library for Audica on the Quest.",
+  "dependencies": [],
+  "modFiles": [
+    "${binary}"
+  ],
+  "libraryFiles": [],
+  "fileCopies": []
+}

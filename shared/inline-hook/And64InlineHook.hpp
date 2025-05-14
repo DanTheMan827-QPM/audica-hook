@@ -28,17 +28,16 @@
  */
 
 #pragma once
+
+#include <cstdint>
 #define A64_MAX_BACKUPS 1024
 #ifdef __aarch64__
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
-
-    void A64HookFunction(void *const symbol, void *const replace, void **result);
-    void *A64HookFunctionV(void *const symbol, void *const replace,
-                           void *const rwx, const uintptr_t rwx_size);
+    void A64HookFunction(void* const symbol, void* const replace, void** result);
+    void* A64HookFunctionV(void* const symbol, void* const replace, void* const rwx, uintptr_t const rwx_size);
 
 #ifdef __cplusplus
 }

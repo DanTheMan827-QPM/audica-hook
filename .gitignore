@@ -1,12 +1,71 @@
+.cache/
 
-shared/libil2cpp/libil2cpp/
+# Prerequisites
+*.d
 
-shared/libil2cpp/
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
 
-hash-mod-test/ndkpath.txt
+# Precompiled Headers
+*.gch
+*.pch
 
-obj/
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
 
-libs/
+# Fortran module files
+*.mod
+*.smod
 
-songloader/ndkpath.txt
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# VSCode config stuff
+!.vscode/c_cpp_properties.json
+!.vscode/tasks.json
+!.vscode/settings.json
+
+# Jetbrains IDEs
+.idea/
+
+# NDK stuff
+out/
+[Ll]ib/
+[Ll]ibs/
+[Oo]bj/
+[Oo]bjs/
+ndkpath.txt
+
+# QPM stuff
+[Ee]xtern/
+*.qmod
+mod.json
+qpm_defines.cmake
+![Cc][Mm]ake[Ll]ists.txt
+
+# CMake stuff
+[Bb]uild/
+cmake-build-*/
+extern.cmake
+
+# QMOD Schema
+mod.json.schema
+include/Hooking.hpp
+include/git-info.h
+
+# Script package ID text file
+package_id.txt
+version.txt
