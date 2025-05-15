@@ -195,18 +195,18 @@ namespace il2cpp_utils {
             }
         }
         if (!ctor) {
-            log(ERROR, "il2cpp_utils: New: Could not find constructor for provided class!");
+            AudicaHook::Logging::Logger.error("il2cpp_utils: New: Could not find constructor for provided class!");
             return nullptr;
         }
         // TODO FIX CTOR CHECKING
         if (strcmp(ctor->name, ".ctor") != 0) {
-            log(ERROR, "il2cpp_utils: New: Found a method matching parameter count and types, but it is not a constructor!");
+            AudicaHook::Logging::Logger.error("il2cpp_utils: New: Found a method matching parameter count and types, but it is not a constructor!");
             return nullptr;
         }
         Il2CppException* exp = nullptr;
         il2cpp_functions::runtime_invoke(ctor, obj, invokeParams, &exp);
         if (exp) {
-            log(ERROR, "il2cpp_utils: New: Failed with exception: %s", ExceptionToString(exp).c_str());
+            AudicaHook::Logging::Logger.error("il2cpp_utils: New: Failed with exception: {}", ExceptionToString(exp).c_str());
             return nullptr;
         }
         return reinterpret_cast<TObj*>(obj);
@@ -223,17 +223,19 @@ namespace il2cpp_utils {
         auto obj = il2cpp_functions::object_new(klass);
         // runtime_invoke constructor with right number of args, return null if constructor errors
         constexpr auto count = sizeof...(TArgs);
-        log(DEBUG, "Attempting to find .ctor with paramCount: %lu for class name: %s", count, il2cpp_functions::class_get_name(klass));
+        AudicaHook::Logging::Logger.debug(
+            "Attempting to find .ctor with paramCount: {} for class name: {}", count, il2cpp_functions::class_get_name(klass)
+        );
         MethodInfo const* ctor = il2cpp_functions::class_get_method_from_name(klass, ".ctor", count);
 
         if (!ctor) {
-            log(ERROR, "il2cpp_utils: New: Could not find constructor for provided class!");
+            AudicaHook::Logging::Logger.error("il2cpp_utils: New: Could not find constructor for provided class!");
             return nullptr;
         }
         Il2CppException* exp;
         il2cpp_functions::runtime_invoke(ctor, obj, invokeParams, &exp);
         if (exp) {
-            log(ERROR, "il2cpp_utils: New: Failed with exception: %s", ExceptionToString(exp).c_str());
+            AudicaHook::Logging::Logger.error("il2cpp_utils: New: Failed with exception: {}", ExceptionToString(exp).c_str());
             return nullptr;
         }
         return reinterpret_cast<TObj*>(obj);
@@ -254,7 +256,7 @@ namespace il2cpp_utils {
     bool RunMethod(TOut* out, void* instance, MethodInfo const* method, TArgs*... params) {
         il2cpp_functions::Init();
         if (!method) {
-            log(ERROR, "il2cpp_utils: RunMethod: Null MethodInfo!");
+            AudicaHook::Logging::Logger.error("il2cpp_utils: RunMethod: Null MethodInfo!");
             return false;
         }
         Il2CppException* exp = nullptr;
@@ -267,10 +269,11 @@ namespace il2cpp_utils {
         }
 
         if (exp) {
-            log(ERROR,
-                "il2cpp_utils: RunMethod: %s: Failed with exception: %s",
+            AudicaHook::Logging::Logger.error(
+                "il2cpp_utils: RunMethod: {}: Failed with exception: {}",
                 il2cpp_functions::method_get_name(method),
-                il2cpp_utils::ExceptionToString(exp).c_str());
+                il2cpp_utils::ExceptionToString(exp).c_str()
+            );
             return false;
         }
         return true;
@@ -293,7 +296,7 @@ namespace il2cpp_utils {
     bool RunMethod(TOut* out, Il2CppClass* klass, std::string_view methodName, TArgs*... params) {
         il2cpp_functions::Init();
         if (!klass) {
-            log(ERROR, "il2cpp_utils: RunMethod: Null klass parameter!");
+            AudicaHook::Logging::Logger.error("il2cpp_utils: RunMethod: Null klass parameter!");
             return false;
         }
         auto method = GetMethod(klass, methodName, sizeof...(TArgs));
@@ -310,12 +313,12 @@ namespace il2cpp_utils {
     bool RunMethod(TOut* out, Il2CppObject* instance, std::string_view methodName, TArgs*... params) {
         il2cpp_functions::Init();
         if (!instance) {
-            log(ERROR, "il2cpp_utils: RunMethod: Null instance parameter!");
+            AudicaHook::Logging::Logger.error("il2cpp_utils: RunMethod: Null instance parameter!");
             return false;
         }
         auto klass = il2cpp_functions::object_get_class(instance);
         if (!klass) {
-            log(ERROR, "il2cpp_utils: RunMethod: Could not get the object's class!");
+            AudicaHook::Logging::Logger.error("il2cpp_utils: RunMethod: Could not get the object's class!");
             return false;
         }
         auto method = GetMethod(klass, methodName, sizeof...(TArgs));
@@ -355,7 +358,7 @@ namespace il2cpp_utils {
     bool GetFieldValue(TOut* out, Il2CppObject* instance, FieldInfo* field) {
         il2cpp_functions::Init();
         if (!field) {
-            log(ERROR, "il2cpp_utils: GetFieldValue: Null FieldInfo!");
+            AudicaHook::Logging::Logger.error("il2cpp_utils: GetFieldValue: Null FieldInfo!");
             return false;
         }
         if (instance) {
@@ -373,7 +376,7 @@ namespace il2cpp_utils {
     bool GetFieldValue(TOut* out, Il2CppClass* klass, std::string_view fieldName) {
         il2cpp_functions::Init();
         if (!klass) {
-            log(ERROR, "il2cpp_utils: GetFieldValue: Could not find object class!");
+            AudicaHook::Logging::Logger.error("il2cpp_utils: GetFieldValue: Could not find object class!");
             return false;
         }
         auto field = FindField(klass, fieldName);
@@ -390,12 +393,12 @@ namespace il2cpp_utils {
     bool GetFieldValue(TOut* out, Il2CppObject* instance, std::string_view fieldName) {
         il2cpp_functions::Init();
         if (!instance) {
-            log(ERROR, "il2cpp_utils: GetFieldValue: Null instance parameter!");
+            AudicaHook::Logging::Logger.error("il2cpp_utils: GetFieldValue: Null instance parameter!");
             return false;
         }
         auto klass = il2cpp_functions::object_get_class(instance);
         if (!klass) {
-            log(ERROR, "il2cpp_utils: GetFieldValue: Could not find object class!");
+            AudicaHook::Logging::Logger.error("il2cpp_utils: GetFieldValue: Could not find object class!");
             return false;
         }
         auto field = FindField(klass, fieldName);
@@ -478,7 +481,9 @@ namespace il2cpp_utils {
         auto action = il2cpp_utils::NewUnsafe<T>(actionClass, obj, &method);
         auto asDelegate = reinterpret_cast<Delegate*>(action);
         if (asDelegate->method_ptr != (void*) callback) {
-            log(ERROR, "Created Action's method_ptr (%p) is incorrect (should be %p)!", asDelegate->method_ptr, callback);
+            AudicaHook::Logging::Logger.error(
+                "Created Action's method_ptr ({}) is incorrect (should be {})!", fmt::ptr(asDelegate->method_ptr), fmt::ptr(callback)
+            );
             return nullptr;
         }
         return action;

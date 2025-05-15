@@ -28,8 +28,8 @@
  */
 
 #pragma once
-
 #include <cstdint>
+
 #define A64_MAX_BACKUPS 1024
 #ifdef __aarch64__
 #ifdef __cplusplus

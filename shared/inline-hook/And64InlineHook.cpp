@@ -49,7 +49,7 @@
 #endif  // NDEBUG
 typedef uint32_t* __restrict* __restrict instruction;
 
-typedef struct {
+typedef struct context {
     struct fix_info {
         uint32_t* bp;
         uint32_t ls;  // left-shift counts
@@ -70,7 +70,6 @@ typedef struct {
     int64_t endp;
     insns_info dat[A64_MAX_INSTRUCTIONS];
 
-   public:
     inline bool is_in_fixing_range(int64_t const absolute_addr) {
         return absolute_addr >= this->basep && absolute_addr < this->endp;
     }
@@ -492,15 +491,12 @@ extern "C" {
 
     //-------------------------------------------------------------------------
 
-    class A64HookInit {
-       public:
-        A64HookInit() {
-            __make_rwx(__insns_pool, sizeof(__insns_pool));
-            A64_LOGI("insns pool initialized.");
-        }
-    };
+    static void* __init = [] {
+        __make_rwx(__insns_pool, sizeof(__insns_pool));
+        A64_LOGI("insns pool initialized.");
 
-    static A64HookInit __init;
+        return nullptr;
+    }();
 
     //-------------------------------------------------------------------------
 

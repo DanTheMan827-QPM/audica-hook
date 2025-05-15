@@ -1,6 +1,6 @@
 // thx https://github.com/jbro129/Unity-Substrate-Hook-Android
 
-#include "utils/utils.hpp"
+#include "audica-hook/utils/utils.hpp"
 
 #include <android/log.h>
 #include <dlfcn.h>

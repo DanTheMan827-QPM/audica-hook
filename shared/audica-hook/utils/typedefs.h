@@ -7,10 +7,10 @@
 #include <cassert>
 #include <type_traits>
 
-#include "../libil2cpp/il2cpp-api-types.h"
-#include "../libil2cpp/il2cpp-class-internals.h"
-#include "../libil2cpp/il2cpp-object-internals.h"
-#include "../libil2cpp/il2cpp-tabledefs.h"
+#include "../../libil2cpp/il2cpp-api-types.h"
+#include "../../libil2cpp/il2cpp-class-internals.h"
+#include "../../libil2cpp/il2cpp-object-internals.h"
+#include "../../libil2cpp/il2cpp-tabledefs.h"
 
 #ifndef __cplusplus
 typedef struct Il2CppObject {

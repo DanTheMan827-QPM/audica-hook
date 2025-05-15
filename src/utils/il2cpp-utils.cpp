@@ -1,4 +1,4 @@
-#include "utils/il2cpp-utils.hpp"
+#include "audica-hook/utils/il2cpp-utils.hpp"
 
 #include <dlfcn.h>
 #include <stdio.h>
@@ -7,8 +7,10 @@
 #include <string>
 #include <string_view>
 
+#include "audica-hook/utils/utils.hpp"
 #include "utils/export.hpp"
-#include "utils/logging.hpp"
+
+using namespace AudicaHook::Logging;
 
 // Please see comments in il2cpp-utils.hpp
 // TODO: Make this into a static class
@@ -42,7 +44,7 @@ namespace il2cpp_utils {
 
         auto dom = il2cpp_functions::domain_get();
         if (!dom) {
-            log(ERROR, "GetClassFromName: Could not get domain!");
+            Logger.error("GetClassFromName: Could not get domain!");
             return nullptr;
         }
         size_t assemb_count;
@@ -52,7 +54,7 @@ namespace il2cpp_utils {
             auto assemb = allAssemb[i];
             auto img = il2cpp_functions::assembly_get_image(assemb);
             if (!img) {
-                log(ERROR, "Assembly with name: %s has a null image!", assemb->aname.name);
+                Logger.error("Assembly with name: {} has a null image!", assemb->aname.name);
                 continue;
             }
             auto klass = il2cpp_functions::class_from_name(img, name_space, type_name);
@@ -60,7 +62,7 @@ namespace il2cpp_utils {
                 return klass;
             }
         }
-        log(ERROR, "il2cpp_utils: GetClassFromName: Could not find class with namepace: %s and name: %s", name_space, type_name);
+        Logger.error("il2cpp_utils: GetClassFromName: Could not find class with namepace: {} and name: {}", name_space, type_name);
         return nullptr;
     }
 
@@ -70,12 +72,13 @@ namespace il2cpp_utils {
         }
         auto methodInfo = il2cpp_functions::class_get_method_from_name(klass, methodName.data(), argsCount);
         if (!methodInfo) {
-            log(ERROR,
-                "could not find method %s with %i parameters in class %s (namespace '%s')!",
+            Logger.error(
+                "could not find method {} with {} parameters in class {} (namespace '{}')!",
                 methodName.data(),
                 argsCount,
                 il2cpp_functions::class_get_name(klass),
-                il2cpp_functions::class_get_namespace(klass));
+                il2cpp_functions::class_get_namespace(klass)
+            );
             return nullptr;
         }
         return methodInfo;
@@ -91,11 +94,12 @@ namespace il2cpp_utils {
         }
         auto field = il2cpp_functions::class_get_field_from_name(klass, fieldName.data());
         if (!field) {
-            log(ERROR,
-                "could not find field %s in class %s (namespace '%s')!",
+            Logger.error(
+                "could not find field {} in class {} (namespace '{}')!",
                 fieldName.data(),
                 il2cpp_functions::class_get_name(klass),
-                il2cpp_functions::class_get_namespace(klass));
+                il2cpp_functions::class_get_namespace(klass)
+            );
         }
         return field;
     }
@@ -103,7 +107,7 @@ namespace il2cpp_utils {
     HOOK_EXPORT bool SetFieldValue(Il2CppObject* instance, FieldInfo* field, void* value) {
         il2cpp_functions::Init();
         if (!field) {
-            log(ERROR, "il2cpp_utils: SetFieldValue: Null field parameter!");
+            Logger.error("il2cpp_utils: SetFieldValue: Null field parameter!");
             return false;
         }
         if (instance) {
@@ -117,7 +121,7 @@ namespace il2cpp_utils {
     HOOK_EXPORT bool SetFieldValue(Il2CppClass* klass, std::string_view fieldName, void* value) {
         il2cpp_functions::Init();
         if (!klass) {
-            log(ERROR, "il2cpp_utils: SetFieldValue: Null klass parameter!");
+            Logger.error("il2cpp_utils: SetFieldValue: Null klass parameter!");
             return false;
         }
         auto field = FindField(klass, fieldName);
@@ -130,12 +134,12 @@ namespace il2cpp_utils {
     HOOK_EXPORT bool SetFieldValue(Il2CppObject* instance, std::string_view fieldName, void* value) {
         il2cpp_functions::Init();
         if (!instance) {
-            log(ERROR, "il2cpp_utils: SetFieldValue: Null instance parameter!");
+            Logger.error("il2cpp_utils: SetFieldValue: Null instance parameter!");
             return false;
         }
         auto klass = il2cpp_functions::object_get_class(instance);
         if (!klass) {
-            log(ERROR, "il2cpp_utils: SetFieldValue: Could not find object class!");
+            Logger.error("il2cpp_utils: SetFieldValue: Could not find object class!");
             return false;
         }
         auto field = FindField(klass, fieldName);
@@ -150,12 +154,12 @@ namespace il2cpp_utils {
 
         auto runtimeType = GetClassFromName("System", "RuntimeType");
         if (!runtimeType) {
-            log(ERROR, "il2cpp_utils: MakeGenericType: Failed to get System.RuntimeType!");
+            Logger.error("il2cpp_utils: MakeGenericType: Failed to get System.RuntimeType!");
             return nullptr;
         }
         auto makeGenericMethod = il2cpp_functions::class_get_method_from_name(runtimeType, "MakeGenericType", 2);
         if (!makeGenericMethod) {
-            log(ERROR, "il2cpp_utils: MakeGenericType: Failed to get RuntimeType.MakeGenericType(param1, param2) method!");
+            Logger.error("il2cpp_utils: MakeGenericType: Failed to get RuntimeType.MakeGenericType(param1, param2) method!");
             return nullptr;
         }
 
@@ -163,7 +167,7 @@ namespace il2cpp_utils {
         void* params[] = {reinterpret_cast<void*>(gt), reinterpret_cast<void*>(types)};
         auto genericType = il2cpp_functions::runtime_invoke(makeGenericMethod, nullptr, params, &exp);
         if (exp) {
-            log(ERROR, "il2cpp_utils: MakeGenericType: Failed with exception: %s", ExceptionToString(exp).c_str());
+            Logger.error("il2cpp_utils: MakeGenericType: Failed with exception: {}", ExceptionToString(exp).c_str());
             return nullptr;
         }
         return reinterpret_cast<Il2CppReflectionType*>(genericType);
@@ -178,20 +182,20 @@ namespace il2cpp_utils {
         }
         auto getType = il2cpp_functions::class_get_method_from_name(typ, "GetType", 1);
         if (!getType) {
-            log(ERROR, "il2cpp_utils: MakeGeneric: Failed to get System.Type.GetType(param1) method!");
+            Logger.error("il2cpp_utils: MakeGeneric: Failed to get System.Type.GetType(param1) method!");
             return nullptr;
         }
 
         auto klassType = il2cpp_functions::type_get_object(il2cpp_functions::class_get_type_const(klass));
         if (!klassType) {
-            log(ERROR, "il2cpp_utils: MakeGeneric: Failed to get class type object!");
+            Logger.error("il2cpp_utils: MakeGeneric: Failed to get class type object!");
             return nullptr;
         }
 
         // Call Type.MakeGenericType on it
         auto a = il2cpp_functions::array_new_specific(typ, args.size());
         if (!a) {
-            log(ERROR, "il2cpp_utils: MakeGeneric: Failed to make new array with length: %zu", args.size());
+            Logger.error("il2cpp_utils: MakeGeneric: Failed to make new array with length: {}", args.size());
             return nullptr;
         }
 
@@ -200,7 +204,7 @@ namespace il2cpp_utils {
             auto t = il2cpp_functions::class_get_type_const(arg);
             auto o = il2cpp_functions::type_get_object(t);
             if (!o) {
-                log(ERROR, "il2cpp_utils: MakeGeneric: Failed to get type for %s", il2cpp_functions::class_get_name_const(arg));
+                Logger.error("il2cpp_utils: MakeGeneric: Failed to get type for {}", il2cpp_functions::class_get_name_const(arg));
                 return nullptr;
             }
             il2cpp_array_set(a, void*, i, reinterpret_cast<void*>(o));
@@ -209,16 +213,16 @@ namespace il2cpp_utils {
 
         auto reflection_type = MakeGenericType(reinterpret_cast<Il2CppReflectionType*>(klassType), a);
         if (!reflection_type) {
-            log(ERROR, "il2cpp_utils: MakeGeneric: Failed to MakeGenericType from Il2CppReflectionType and Il2CppArray!");
+            Logger.error("il2cpp_utils: MakeGeneric: Failed to MakeGenericType from Il2CppReflectionType and Il2CppArray!");
             return nullptr;
         }
 
         auto ret = il2cpp_functions::class_from_system_type(reinterpret_cast<Il2CppReflectionType*>(reflection_type));
         if (!ret) {
-            log(ERROR, "il2cpp_utils: MakeGeneric: Failed to get class from Il2CppReflectionType!");
+            Logger.error("il2cpp_utils: MakeGeneric: Failed to get class from Il2CppReflectionType!");
             return nullptr;
         }
-        log(DEBUG, "il2cpp_utils: MakeGeneric: returning %s", il2cpp_functions::class_get_name(ret));
+        Logger.debug("il2cpp_utils: MakeGeneric: returning {}", il2cpp_functions::class_get_name(ret));
         return ret;
     }
 
@@ -293,7 +297,7 @@ namespace il2cpp_utils {
         }
         auto const& paramStrRef = paramStream.str();
         char const* paramStr = paramStrRef.c_str();
-        log(DEBUG, "%s%s %s(%s);", flagStr, retTypeStr, methodName, paramStr);
+        Logger.debug("{}{} {}({});", flagStr, retTypeStr, methodName, paramStr);
     }
 
     HOOK_EXPORT void LogField(FieldInfo* field) {
@@ -307,35 +311,36 @@ namespace il2cpp_utils {
         name = name ? name : "__noname__";
         auto offset = il2cpp_functions::field_get_offset(field);
 
-        log(DEBUG, "%s%s %s; // 0x%lx, flags: 0x%.4X", flagStr, typeStr, name, offset, flags);
+        Logger.debug("{}{} {}; // 0x{:x}, flags: 0x{:#04X}", flagStr, typeStr, name, offset, flags);
     }
 
     HOOK_EXPORT void LogClass(Il2CppClass const* klass, bool logParents) {
         il2cpp_functions::Init();
 
         auto unconst = const_cast<Il2CppClass*>(klass);
-        log(DEBUG,
-            "======================CLASS INFO FOR CLASS: %s::%s======================",
+        Logger.debug(
+            "======================CLASS INFO FOR CLASS: {}::{}======================",
             il2cpp_functions::class_get_namespace(unconst),
-            il2cpp_functions::class_get_name(unconst));
-        log(DEBUG, "Assembly Name: %s", il2cpp_functions::class_get_assemblyname(klass));
-        log(DEBUG, "Rank: %i", il2cpp_functions::class_get_rank(klass));
-        log(DEBUG, "Type Token: %i", il2cpp_functions::class_get_type_token(unconst));
-        log(DEBUG, "Flags: 0x%.8X", il2cpp_functions::class_get_flags(klass));
-        log(DEBUG, "Event Count: %i", klass->event_count);
-        log(DEBUG, "Field Count: %i", klass->field_count);
-        log(DEBUG, "Method Count: %i", klass->method_count);
-        log(DEBUG, "Property Count: %i", klass->property_count);
-        log(DEBUG, "Is Generic: %i", il2cpp_functions::class_is_generic(klass));
-        log(DEBUG, "Is Abstract: %i", il2cpp_functions::class_is_abstract(klass));
-        log(DEBUG, "=========METHODS=========");
+            il2cpp_functions::class_get_name(unconst)
+        );
+        Logger.debug("Assembly Name: {}", il2cpp_functions::class_get_assemblyname(klass));
+        Logger.debug("Rank: {}", il2cpp_functions::class_get_rank(klass));
+        Logger.debug("Type Token: {}", il2cpp_functions::class_get_type_token(unconst));
+        Logger.debug("Flags: 0x{:#08X}", il2cpp_functions::class_get_flags(klass));
+        Logger.debug("Event Count: {}", klass->event_count);
+        Logger.debug("Field Count: {}", klass->field_count);
+        Logger.debug("Method Count: {}", klass->method_count);
+        Logger.debug("Property Count: {}", klass->property_count);
+        Logger.debug("Is Generic: {}", il2cpp_functions::class_is_generic(klass));
+        Logger.debug("Is Abstract: {}", il2cpp_functions::class_is_abstract(klass));
+        Logger.debug("=========METHODS=========");
         void* myIter = nullptr;
         for (int i = 0; i < unconst->method_count; i++) {
             if (unconst->methods[i]) {
-                log(DEBUG, "Method %i:", i);
-                log(DEBUG, "Name: %s Params: %i", unconst->methods[i]->name, unconst->methods[i]->parameters_count);
+                Logger.debug("Method {}:", i);
+                Logger.debug("Name: {} Params: {}", unconst->methods[i]->name, unconst->methods[i]->parameters_count);
             } else {
-                log(DEBUG, "Method: %i Does not exist!", i);
+                Logger.debug("Method: {} Does not exist!", i);
             }
         }
         auto genClass = klass->generic_class;
@@ -345,35 +350,35 @@ namespace il2cpp_utils {
             if (genInst) {
                 for (int i = 0; i < genInst->type_argc; i++) {
                     auto typ = genInst->type_argv[i];
-                    log(DEBUG, " generic type %i: %s", i + 1, TypeGetSimpleName(typ));
+                    Logger.debug(" generic type {}: {}", i + 1, TypeGetSimpleName(typ));
                 }
             }
         }
         auto declaring = il2cpp_functions::class_get_declaring_type(unconst);
-        log(DEBUG, "declaring type: %p", declaring);
+        Logger.debug("declaring type: {}", fmt::ptr(declaring));
         if (declaring) {
             LogClass(declaring);
         }
         auto element = il2cpp_functions::class_get_element_class(unconst);
-        log(DEBUG, "element class: %p (self = %p)", element, klass);
+        Logger.debug("element class: {} (self = {})", fmt::ptr(element), fmt::ptr(klass));
         if (element && element != klass) {
             LogClass(element);
         }
 
-        log(DEBUG, "=========FIELDS=========");
+        Logger.debug("=========FIELDS=========");
         myIter = nullptr;
         FieldInfo* field;
         while ((field = il2cpp_functions::class_get_fields(unconst, &myIter))) {
             LogField(field);
         }
-        log(DEBUG, "=========END FIELDS=========");
+        Logger.debug("=========END FIELDS=========");
 
         auto parent = il2cpp_functions::class_get_parent(unconst);
-        log(DEBUG, "parent: %p", parent);
+        Logger.debug("parent: {}", fmt::ptr(parent));
         if (parent && logParents) {
             LogClass(parent);
         }
-        log(DEBUG, "==================================================================================");
+        Logger.debug("==================================================================================");
     }
 
     HOOK_EXPORT Il2CppString* createcsstr(std::string_view inp) {
@@ -388,10 +393,11 @@ namespace il2cpp_utils {
     HOOK_EXPORT bool AssertMatch(Il2CppObject const* source, Il2CppClass const* klass) {
         il2cpp_functions::Init();
         if (!Match(source, klass)) {
-            log(CRITICAL,
-                "il2cpp_utils: AssertMatch: Unhandled subtype: namespace %s, class %s",
+            Logger.critical(
+                "il2cpp_utils: AssertMatch: Unhandled subtype: namespace {}, class {}",
                 il2cpp_functions::class_get_namespace(source->klass),
-                il2cpp_functions::class_get_name(source->klass));
+                il2cpp_functions::class_get_name(source->klass)
+            );
             std::terminate();
         }
         return true;

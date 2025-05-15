@@ -1,6 +1,6 @@
 #pragma once
 
-#include "scotland2/shared/loader.hpp"
+#include <scotland2/shared/loader.hpp>
 
 #if __has_include("git-info.h")
 #include "git-info.h"
