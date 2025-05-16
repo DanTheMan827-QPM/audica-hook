@@ -131,7 +131,7 @@ jobs:
         uses: Fernthedev/qpm-action@v1
         with:
           cache: true
-          publish_token: ${{ secrets.QPM_KEY }}
+          publish_token: ${{ secrets.QPM_TOKEN }}
           publish: late
           qpm_debug_bin: true
           qpm_qmod: ${{ needs.qpm_info.outputs.qmod_output_name }}
