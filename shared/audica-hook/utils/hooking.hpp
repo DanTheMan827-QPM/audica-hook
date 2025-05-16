@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <cstdint>
 #include <paper2_scotland2/shared/logger.hpp>
 #include <vector>
 
@@ -104,7 +105,7 @@ namespace AudicaHook::Utils::Hooking {
     requires(is_hook<T> && is_logger<L>)
     inline void InstallHook(L& logger) {
 #ifndef SUPPRESS_MACRO_LOGS
-        logger.info("Installing hook: {} to offset: {}", T::name(), fmt::ptr(T::addr()));
+        logger.info("Installing hook: {} to offset: {}", T::name(), reinterpret_cast<uint64_t>(T::addr()));
 #endif
 
 #ifdef __aarch64__

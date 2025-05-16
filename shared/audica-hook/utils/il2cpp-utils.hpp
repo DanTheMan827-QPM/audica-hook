@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <cstdint>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -482,7 +483,9 @@ namespace il2cpp_utils {
         auto asDelegate = reinterpret_cast<Delegate*>(action);
         if (asDelegate->method_ptr != (void*) callback) {
             AudicaHook::Logging::Logger.error(
-                "Created Action's method_ptr ({}) is incorrect (should be {})!", fmt::ptr(asDelegate->method_ptr), fmt::ptr(callback)
+                "Created Action's method_ptr ({}) is incorrect (should be {})!",
+                reinterpret_cast<uint64_t>(asDelegate->method_ptr),
+                reinterpret_cast<uint64_t>(callback)
             );
             return nullptr;
         }

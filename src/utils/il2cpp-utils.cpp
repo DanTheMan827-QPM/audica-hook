@@ -355,12 +355,12 @@ namespace il2cpp_utils {
             }
         }
         auto declaring = il2cpp_functions::class_get_declaring_type(unconst);
-        Logger.debug("declaring type: {}", fmt::ptr(declaring));
+        Logger.debug("declaring type: {}", reinterpret_cast<uint64_t>(declaring));
         if (declaring) {
             LogClass(declaring);
         }
         auto element = il2cpp_functions::class_get_element_class(unconst);
-        Logger.debug("element class: {} (self = {})", fmt::ptr(element), fmt::ptr(klass));
+        Logger.debug("element class: {} (self = {})", reinterpret_cast<uint64_t>(element), reinterpret_cast<uint64_t>(klass));
         if (element && element != klass) {
             LogClass(element);
         }
@@ -374,7 +374,7 @@ namespace il2cpp_utils {
         Logger.debug("=========END FIELDS=========");
 
         auto parent = il2cpp_functions::class_get_parent(unconst);
-        Logger.debug("parent: {}", fmt::ptr(parent));
+        Logger.debug("parent: {}", reinterpret_cast<uint64_t>(parent));
         if (parent && logParents) {
             LogClass(parent);
         }

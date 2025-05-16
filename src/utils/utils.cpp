@@ -79,7 +79,7 @@ namespace AudicaHook::Utils {
 
         if (location == 0) {
             // arm
-            location = baseAddr(IL2CPP_SO_PATH);  // replace the com.package.name with the package name of the app you are modding.
+            location = baseAddr(AudicaHook::Utils::IL2CPP_SO_PATH);  // replace the com.package.name with the package name of the app you are modding.
         }
         return location + (long long) offset;
     }
