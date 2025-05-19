@@ -10,7 +10,6 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "../utils/utils.hpp"
 #include "il2cpp-functions.hpp"
 #include "logging.hpp"
 #include "typedefs.h"

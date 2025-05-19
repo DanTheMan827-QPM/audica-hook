@@ -6,7 +6,7 @@
   "info": {
     "name": "Audica Hook",
     "id": "audica-hook",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "url": "https://github.com/DanTheMan827/audica-hook",
     "additionalData": {
       "overrideSoName": "libAudicaHook.so",
