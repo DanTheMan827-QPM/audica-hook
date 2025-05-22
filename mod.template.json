@@ -6,7 +6,7 @@
   "author": "sc2ad / DanTheMan827",
   "version": "${version}",
   "packageId": "com.harmonixmusic.kata",
-  "isLibrary": false,
+  "isLibrary": true,
   "description": "A significantly stripped down version of the beatsaber-hook library for Audica on the Quest.",
   "dependencies": [],
   "modFiles": [
